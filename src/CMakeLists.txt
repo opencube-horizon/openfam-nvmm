@@ -9,7 +9,8 @@ add_library(nvmm SHARED
   common/log.cc
   common/crash_points.cc
   common/config.cc
-  $<$<NOT:$<BOOL:${USE_FAM_ATOMIC}>>:
+  common/fam_atomic.c
+  $<$<STREQUAL:${USE_ATOMICS},native>:
     common/fam_atomic_x86.c>
 
   shelf_mgmt/shelf_file.cc
@@ -55,6 +56,7 @@ target_include_directories(nvmm PUBLIC
 target_link_libraries(nvmm PUBLIC
   Boost::log_setup
   Boost::log
+  ${ATOMICS_LIBRARIES}
 )
 
 target_link_libraries(nvmm PRIVATE

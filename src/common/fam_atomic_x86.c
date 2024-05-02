@@ -1,5 +1,5 @@
 /*
- *  (c) Copyright 2016-2021 Hewlett Packard Enterprise Development Company LP.
+ *  (c) Copyright 2016-2024 Hewlett Packard Enterprise Development Company LP.
  *
  *  Author: Jason Low <jason.low2@hpe.com>
  *
@@ -25,8 +25,6 @@
  *
  */
 
-// #include <stdatomic.h>
-// #include <atomic.h>
 #include "nvmm/fam_atomic_x86.h"
 #include <assert.h>
 #include <stdio.h>
@@ -293,15 +291,6 @@ static inline void __ioctl(int fd, unsigned int opt, unsigned long args) {
     return;
 }
 
-int fam_atomic_register_region(void *region_start, size_t region_length, int fd,
-                               off_t offset) {
-    return 0;
-}
-
-void fam_atomic_unregister_region(void *region_start, size_t region_length) {
-    return;
-}
-
 /*
  * Returns true if we should use zbridge atomics, else returns false.
  */
@@ -309,6 +298,14 @@ static inline bool fam_atomic_get_fd_offset(void *address, int *dev_fd,
                                             int *lfs_fd, int64_t *offset) {
     *offset = (int64_t)address;
     return false;
+}
+
+int32_t fam_atomic_32_read(int32_t *address) {
+    return fam_atomic_32_fetch_add(address, 0);
+}
+
+int64_t fam_atomic_64_read(int64_t *address) {
+    return fam_atomic_64_fetch_add(address, 0);
 }
 
 int32_t fam_atomic_32_fetch_add(int32_t *address, int32_t increment) {
@@ -513,15 +510,7 @@ void fam_atomic_128_compare_store(int64_t *address, int64_t compare[2],
     result[1] = args.p128_0[1];
 }
 
-int32_t fam_atomic_32_read(int32_t *address) {
-    return fam_atomic_32_fetch_add(address, 0);
-}
-
-int64_t fam_atomic_64_read(int64_t *address) {
-    return fam_atomic_64_fetch_add(address, 0);
-}
-
-extern void fam_atomic_128_read(int64_t *address, int64_t result[2]) {
+void fam_atomic_128_read(int64_t *address, int64_t result[2]) {
     int64_t old[2];
     int dev_fd, lfs_fd;
     int64_t offset;
@@ -652,45 +641,4 @@ int64_t fam_atomic_64_fetch_xor(int64_t *address, int64_t arg) {
 
         prev = actual;
     }
-}
-
-void fam_spin_lock_init(struct fam_spinlock *lock) {
-    fam_atomic_64_write(&lock->head_tail, 0);
-}
-
-void fam_spin_lock(struct fam_spinlock *lock) {
-    struct fam_spinlock inc = {.tickets = {.head = 0, .tail = 1}};
-
-    /* Fetch the current values and bump the tail by one */
-    inc.head_tail = fam_atomic_64_fetch_add(&lock->head_tail, inc.head_tail);
-
-    if (inc.tickets.head != inc.tickets.tail) {
-        for (;;) {
-            inc.tickets.head = fam_atomic_32_fetch_add(&lock->tickets.head, 0);
-            if (inc.tickets.head == inc.tickets.tail)
-                break;
-        }
-    }
-    __sync_synchronize();
-}
-
-bool fam_spin_trylock(struct fam_spinlock *lock) {
-    struct fam_spinlock old, new;
-    bool ret;
-
-    old.head_tail = fam_atomic_64_fetch_add(&lock->head_tail, (int64_t)0);
-    if (old.tickets.head != old.tickets.tail)
-        return 0;
-
-    new.tickets.head = old.tickets.head;
-    new.tickets.tail = old.tickets.tail + 1;
-    ret = fam_atomic_64_compare_store(&lock->head_tail, old.head_tail,
-                                      new.head_tail) == old.head_tail;
-    __sync_synchronize();
-    return ret;
-}
-
-void fam_spin_unlock(struct fam_spinlock *lock) {
-    (void)fam_atomic_32_fetch_add(&lock->tickets.head, 1);
-    __sync_synchronize();
 }

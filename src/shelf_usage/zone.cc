@@ -28,14 +28,9 @@
 
 #include <assert.h>
 #include <cstring> // for memset
-#include <iostream>
-#include <sstream>
-#include <stdexcept>
-#include <string>
 #include <time.h>
 #include <unistd.h>
 
-#include "nvmm/global_ptr.h"
 #include "nvmm/nvmm_fam_atomic.h"
 
 #include "common/common.h"
@@ -365,7 +360,7 @@ Zone::Zone(void *addr, size_t initial_pool_size, size_t min_obj_size,
     }
 
     // init current_merge_level
-    fam_atomic_64_write((int64_t *)&zoneheader->current_merge_level, -1);
+    fam_atomic_64_write(&zoneheader->current_merge_level, -1);
     merge_bitmap_start_addr = (uint8_t *)(zone_header_ptr + zoneheader_size);
 
 #if 0

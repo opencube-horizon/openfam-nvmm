@@ -107,17 +107,23 @@ find_package(Pmem REQUIRED)
 find_package(yaml-cpp REQUIRED)
 
 #
-# use libfam_atomic?
+# atomics implementation
 #
-option(USE_FAM_ATOMIC "Use the FamAtomic library for atomics, default: off (use native)" OFF)
+set(USE_ATOMICS "compiler" CACHE STRING
+    "which atomics implementation to use (default: compiler)")
+set_property(CACHE USE_ATOMICS PROPERTY STRINGS compiler native fam_atomic)
 
-if(USE_FAM_ATOMIC)
-  message(STATUS "Unsupported atomics library option 'FAM', falling back to atomics library: native")
-  add_compile_definitions(FAM_ATOMIC_NATIVE)
+if(USE_ATOMICS MATCHES "compiler")
+  find_package(Atomics REQUIRED)
+  message(STATUS "Using compiler builtins for atomics")
+elseif(USE_ATOMICS MATCHES "fam_atomic")
   #find_package(FamAtomic REQUIRED)
   #set(ARCH_LIBS ${ARCH_LIBS} ${FAM_ATOMIC_LIBRARY})
-else()
-  message(STATUS "atomics library: native")
+  message(STATUS "Unsupported atomics library option fam_atomic, falling back to atomics library: native")
+  add_compile_definitions(FAM_ATOMIC_NATIVE)
+  set(USE_ATOMICS "native")
+elseif(USE_ATOMICS MATCHES "native")
+  message(STATUS "Using built-in atomics (limited arch support)")
   add_compile_definitions(FAM_ATOMIC_NATIVE)
 endif()
 
