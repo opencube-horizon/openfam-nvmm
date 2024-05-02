@@ -1,5 +1,5 @@
 /*
- *  (c) Copyright 2016-2021 Hewlett Packard Enterprise Development Company LP.
+ *  (c) Copyright 2016-2024 Hewlett Packard Enterprise Development Company LP.
  *
  *  This software is available to you under a choice of one of two
  *  licenses. You may choose to be licensed under the terms of the
@@ -23,22 +23,26 @@
  *
  */
 
+#if defined(__x86_64__)
 #include <emmintrin.h> // for _mm_clflush
+#endif
+
 #include <libpmem.h>
 #include <stdint.h>
 #include <string.h>
 
 void fam_invalidate(const void *addr, size_t len) {
-    /* #ifndef PMEM_INVALIDATE_NOOP */
-    /*   pmem_invalidate(addr, len); */
-    /* #else */
-    uintptr_t uptr;
-
-    uintptr_t FLUSH_ALIGN = (uintptr_t)64;
-    for (uptr = (uintptr_t)addr & ~(FLUSH_ALIGN - 1);
-         uptr < (uintptr_t)addr + len; uptr += FLUSH_ALIGN)
+    const static uintptr_t FLUSH_ALIGN = (uintptr_t)64;
+    for (uintptr_t uptr = (uintptr_t)addr & ~(FLUSH_ALIGN - 1);
+         uptr < (uintptr_t)addr + len; uptr += FLUSH_ALIGN) {
+#ifdef __x86_64__
         _mm_clflush((char *)uptr);
-    /* #endif */
+#elif defined(__aarch64__)
+        asm volatile("dc\tivac, %0" : : "r"((char *)uptr) : "memory");
+#else
+#pragma error "No implementation for cache invalidation"
+#endif
+    }
 }
 
 void fam_persist(const void *addr, size_t len) { pmem_persist(addr, len); }
