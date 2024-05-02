@@ -64,7 +64,3 @@ target_link_libraries(nvmm PRIVATE
   Boost::filesystem
   ${YAML_CPP_LIBRARIES}
 )
-
-target_compile_definitions(nvmm PRIVATE
-  $<$<NOT:$<BOOL:${Pmem_HAS_PMEM_INVALIDATE}>>:PMEM_INVALIDATE_NOOP>
-)

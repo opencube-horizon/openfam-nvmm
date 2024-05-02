@@ -16,17 +16,6 @@ find_library(Pmem_LIBRARY
   PATHS ${PC_Pmem_LIBRARY_DIRS}
 )
 
-# Check if pmem_invalidate is supported
-if(Pmem_INCLUDE_DIR AND Pmem_LIBRARY)
-  include(CheckLibraryExists)
-  check_library_exists(pmem pmem_invalidate ${Pmem_LIBRARY} Pmem_HAS_PMEM_INVALIDATE)
-  if(${Pmem_HAS_PMEM_INVALIDATE})
-    message(STATUS "libpmem: pmem_invalidate() is supported")
-  else()
-    message(STATUS "libpmem: pmem_invalidate() is noop")
-  endif()
-endif()
-
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(Pmem
   REQUIRED_VARS
