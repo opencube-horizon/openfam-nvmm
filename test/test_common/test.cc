@@ -23,25 +23,42 @@
  *
  */
 
-#include <fcntl.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
-
-#include "nvmm/error_code.h"
-#include "nvmm/log.h"
-#include "nvmm/memory_manager.h"
-#include "nvmm/nvmm_fam_atomic.h"
-#include "nvmm/shelf_id.h"
-
 #include "test_common/test.h"
+#include "nvmm/memory_manager.h"
+
+#ifdef GCOV
+#include <csignal>
+#include <cstdlib>
+
+// Reference: https://stackoverflow.com/a/74065331
+// https://gcc.gnu.org/onlinedocs/gcc/Gcov-and-Optimization.html
+#if __GNUC__ <= 11
+#define __gcov_dump __gcov_flush
+#endif
+
+extern "C" void __gcov_dump(void);
+[[noreturn]] void terminateHandler() {
+    __gcov_dump();
+    std::abort();
+}
+
+void signalHandler(int signum) {
+    __gcov_dump();
+    signal(signum, SIG_DFL);
+    raise(signum);
+    return;
+}
+#endif
 
 namespace nvmm {
-
 // TODO: move this to nvmm level
 // NOTE: this function must be run once and only once for every test
 void Environment::SetUp() {
+#ifdef GCOV
+    signal(SIGINT, signalHandler);
+    std::set_terminate(&terminateHandler); // register a handler to also get
+                                           // profiles on aborted tests
+#endif
 #ifdef LFSWORKAROUND
     sleep(10);
 #endif

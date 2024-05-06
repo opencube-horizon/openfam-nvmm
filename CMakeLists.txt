@@ -172,17 +172,20 @@ set(cxx_flags
   -Wconversion
   -Wunreachable-code
 )
-set(cxx_debug_flags -g -Og)
-set(cxx_coverage_flags ${cxx_debug_flags} -fprofile-arcs -ftest-coverage)
+set(debug_flags -g -Og)
+# --coverage enables required flags on both GCC and LLVM and works with both compilation and linking
+set(coverage_flags --coverage)
 add_compile_options(
   "$<$<COMPILE_LANGUAGE:CXX>:${cxx_flags}>"
-  "$<$<CONFIG:Debug>:${cxx_debug_flags}>"
-  "$<$<CONFIG:Coverage>:${cxx_coverage_flags}>"
+  "$<$<CONFIG:Debug>:${debug_flags}>"
+  "$<$<CONFIG:Coverage>:${debug_flags}>"
+  "$<$<CONFIG:Coverage>:${coverage_flags}>"
 )
-
+add_link_options("$<$<CONFIG:Coverage>:${coverage_flags}>")
 add_compile_definitions(
   "$<$<OR:$<CONFIG:Debug>,$<CONFIG:Coverage>>:DEBUG>"
   "$<$<CONFIG:Coverage>:COVERAGE>"
+  "$<$<AND:$<CONFIG:Coverage>,$<CXX_COMPILER_ID:GNU>>:GCOV>"
 )
 
 include(CheckPIESupported)
