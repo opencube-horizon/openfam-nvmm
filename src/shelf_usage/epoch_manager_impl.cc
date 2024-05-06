@@ -29,12 +29,10 @@
 #include <sstream>
 #include <stdexcept>
 #include <stdio.h>
-#include <string>
 #include <thread>
 #include <unistd.h>
 
 #include "nvmm/epoch_manager.h"
-#include "nvmm/fam.h"
 
 #include "shelf_usage/epoch_manager_impl.h"
 #include "shelf_usage/epoch_vector_internal.h"

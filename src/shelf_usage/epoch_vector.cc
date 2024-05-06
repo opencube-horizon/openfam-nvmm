@@ -23,14 +23,12 @@
  *
  */
 
-#include <assert.h>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <time.h>
 
-#include "nvmm/fam.h"
-
+#include "nvmm/nvmm_fam_atomic.h"
 #include "shelf_usage/epoch_vector.h"
 #include "shelf_usage/epoch_vector_internal.h"
 #include "shelf_usage/hrtime.h"

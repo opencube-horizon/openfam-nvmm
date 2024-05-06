@@ -109,8 +109,7 @@ TEST(EpochZoneHeap, DelayedFree) {
         ptr1 = heap->Alloc(op, sizeof(int));
         heap->Free(op, ptr1);
         // allocate again, because of delayed free, the new ptr should be
-        // different from t he
-        // previous ptr
+        // different from the previous ptr
         GlobalPtr ptr2 = heap->Alloc(op, sizeof(int));
         EXPECT_NE(ptr1, ptr2);
         heap->Free(op, ptr2);

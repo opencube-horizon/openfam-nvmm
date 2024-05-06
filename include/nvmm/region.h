@@ -29,8 +29,9 @@
 #include "nvmm/error_code.h"
 #include "nvmm/shelf_id.h"
 
-#include <fcntl.h>    // for O_RDWR
-#include <sys/mman.h> // for PROT_READ, PROT_WRITE, MAP_SHARED
+#include <fcntl.h>     // for O_RDWR
+#include <sys/mman.h>  // for PROT_READ, PROT_WRITE, MAP_SHARED
+#include <sys/types.h> // for loff_t
 
 namespace nvmm {
 
