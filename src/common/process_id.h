@@ -67,7 +67,7 @@ class ProcessID {
     uint64_t pid_;
     uint64_t
         btime_; // creation time (number of jiffies since the machine booted)
-};
+} __attribute__((aligned(16)));
 
 } // namespace nvmm
 
