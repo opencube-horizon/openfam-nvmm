@@ -62,6 +62,7 @@ class EpochVector {
 
   public:
     EpochVector(_EpochVector *vec, bool may_create);
+    ~EpochVector();
 
     /** Return the frontier epoch */
     EpochCounter frontier();

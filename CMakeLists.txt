@@ -172,7 +172,7 @@ set(cxx_flags
   -Wconversion
   -Wunreachable-code
 )
-set(debug_flags -g -Og)
+set(debug_flags -g -Og -fsanitize=address -fsanitize=leak)
 # --coverage enables required flags on both GCC and LLVM and works with both compilation and linking
 set(coverage_flags --coverage)
 add_compile_options(
@@ -181,7 +181,10 @@ add_compile_options(
   "$<$<CONFIG:Coverage>:${debug_flags}>"
   "$<$<CONFIG:Coverage>:${coverage_flags}>"
 )
-add_link_options("$<$<CONFIG:Coverage>:${coverage_flags}>")
+add_link_options(
+  "$<$<CONFIG:Debug>:${debug_flags}>"
+  "$<$<CONFIG:Coverage>:${coverage_flags}>"
+)
 add_compile_definitions(
   "$<$<OR:$<CONFIG:Debug>,$<CONFIG:Coverage>>:DEBUG>"
   "$<$<CONFIG:Coverage>:COVERAGE>"

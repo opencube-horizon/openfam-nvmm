@@ -387,7 +387,7 @@ TEST(MemoryManager, HeapHugeObjects) {
     EXPECT_EQ(NO_ERROR, mm->DestroyHeap(pool_id));
     EXPECT_EQ(ID_NOT_FOUND, mm->DestroyHeap(pool_id));
 
-    delete buf;
+    delete[] buf;
 }
 #endif
 #ifndef LFSWORKAROUND
@@ -576,16 +576,13 @@ TEST(MemoryManager, MultiProcessHeap) {
         if (pid[i] == 0) {
             // child
             LocalAllocRemoteFree(heap_pool_id, comm_shelf_id);
-            exit(0); // this will leak memory (see valgrind output)
-        } else {
-            // parent
-            continue;
+            exit(testing::Test::HasFailure()); // this will leak memory (see
+                                               // valgrind output)
         }
     }
 
     for (int i = 0; i < process_count; i++) {
-        int status;
-        waitpid(pid[i], &status, 0);
+        ASSERT_EQ(0, wait_for_child_fork(pid[i]));
     }
 
     // =======================================================================

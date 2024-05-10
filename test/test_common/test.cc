@@ -23,8 +23,13 @@
  *
  */
 
-#include "test_common/test.h"
+#include <iostream>
+
 #include "nvmm/memory_manager.h"
+#include "test_common/test.h"
+
+#include <sys/types.h>
+#include <sys/wait.h>
 
 #ifdef GCOV
 #include <csignal>
@@ -50,7 +55,6 @@ void signalHandler(int signum) {
 }
 #endif
 
-namespace nvmm {
 // TODO: move this to nvmm level
 // NOTE: this function must be run once and only once for every test
 void Environment::SetUp() {
@@ -69,8 +73,26 @@ void Environment::SetUp() {
         nvmm::init_log(level_, "mm.log");
     }
 
-    ResetNVMM();
-    StartNVMM();
+    nvmm::ResetNVMM();
+    nvmm::StartNVMM();
 }
 
-} // namespace nvmm
+// based on code from
+// https://github.com/google/googletest/issues/1153#issuecomment-428247477
+int wait_for_child_fork(int pid) {
+    int status;
+    if (0 > waitpid(pid, &status, 0)) {
+        std::cerr << "[----------]  Waitpid error!" << std::endl;
+        return -1;
+    }
+    if (WIFEXITED(status)) {
+        const int exit_status = WEXITSTATUS(status);
+        if (exit_status != 0)
+            std::cerr << "[----------]  Non-zero exit status " << exit_status
+                      << " from test!" << std::endl;
+        return exit_status;
+    } else {
+        std::cerr << "[----------]  Abnormal exit from child!" << std::endl;
+        return -2;
+    }
+}

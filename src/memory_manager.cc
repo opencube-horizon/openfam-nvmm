@@ -547,6 +547,7 @@ ErrorCode MemoryManager::Impl_::FindHeap(PoolId id, Heap **heap) {
         *heap = (Heap *)heap_;
         return NO_ERROR;
     } else {
+        delete heap_;
         LOG(error) << "MemoryManager: heap of the given id (" << (uint64_t)id
                    << ") is not found";
         return ID_NOT_FOUND;
@@ -694,14 +695,14 @@ void *MemoryManager::Impl_::GlobalToLocal(GlobalPtr ptr) {
         ShelfIndex shelf_idx = shelf_id.GetShelfIndex();
         std::string shelf_path;
         ret = pool.GetShelfPath(shelf_idx, shelf_path);
+
+        (void)pool.Close(false);
+
         if (ret != NO_ERROR) {
             return NULL;
         }
 
         addr = ShelfManager::FindBase(shelf_path, shelf_id);
-
-        // close the pool
-        (void)pool.Close(false);
     }
 
     if (addr != NULL) {

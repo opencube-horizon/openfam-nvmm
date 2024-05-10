@@ -58,7 +58,7 @@ FreeLists::FreeLists(void *addr, size_t avail_size)
 }
 
 FreeLists::~FreeLists() {
-    if (IsOpen() == true) {
+    if (IsOpen()) {
         (void)Close();
     }
 }
@@ -179,6 +179,7 @@ ErrorCode FreeLists::Open() {
 
 ErrorCode FreeLists::Close() {
     assert(IsOpen() == true);
+    delete fba_;
     is_open_ = false;
     return NO_ERROR;
 }

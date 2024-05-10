@@ -89,6 +89,8 @@ TEST(FixedBlockAllocator, Test) {
     }
     EXPECT_EQ((Offset)0, fba.alloc());
 
+    delete[] ptr;
+
     // unmap
     EXPECT_EQ(NO_ERROR, shelf.Unmap(address, kShelfSize));
     EXPECT_EQ(NO_ERROR, shelf.Close());

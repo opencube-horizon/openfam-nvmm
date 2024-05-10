@@ -23,17 +23,12 @@
  *
  */
 
-#include <functional>
-#include <iostream>
 #include <pthread.h>
 #include <stddef.h>
-#include <stdint.h>
-#include <string>
 
-#include <assert.h>
 #include <boost/filesystem.hpp>
+#include <cassert>
 #include <fcntl.h> // for O_RDWR
-#include <limits>
 #include <random>
 #include <sys/mman.h> // for PROT_READ, PROT_WRITE, MAP_SHARED
 

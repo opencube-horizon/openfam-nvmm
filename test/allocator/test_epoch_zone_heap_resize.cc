@@ -98,16 +98,11 @@ TEST(EpochZoneHeapResize, MultiProcessResize) {
             }
             heap->Close();
             delete heap;
-            exit(0);
-        } else {
-            // parent process...
-            // continue
+            exit(testing::Test::HasFailure());
         }
     }
     for (int i = 0; i < process_count; i++) {
-        int status;
-        waitpid(pid[i], &status, 0);
-        EXPECT_EQ(status, 0);
+        ASSERT_EQ(0, wait_for_child_fork(pid[i]));
     }
     MemoryManager *mm = MemoryManager::GetInstance();
     EXPECT_EQ(NO_ERROR, mm->DestroyHeap(pool_id));

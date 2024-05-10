@@ -145,6 +145,8 @@ EpochVector::EpochVector(_EpochVector *ev, bool may_create) : ev_(ev) {
     cache_ = new Element[NR_PARTICIPANT];
 }
 
+EpochVector::~EpochVector() { delete[] cache_; }
+
 int EpochVector::register_participant(ParticipantID pid,
                                       Participant *participant) {
     int slot;

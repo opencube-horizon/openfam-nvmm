@@ -29,8 +29,6 @@
 #include "nvmm/log.h"
 #include <gtest/gtest.h>
 
-namespace nvmm {
-
 class Environment : public ::testing::Environment {
   public:
     Environment(boost::log::trivial::severity_level level =
@@ -52,6 +50,6 @@ class Environment : public ::testing::Environment {
     bool to_console_;
 };
 
-} // namespace nvmm
+int wait_for_child_fork(int pid);
 
 #endif
