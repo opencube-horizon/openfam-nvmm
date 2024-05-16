@@ -53,16 +53,16 @@ target_include_directories(nvmm PUBLIC
   $<INSTALL_INTERFACE:include>
 )
 
-target_link_libraries(nvmm PUBLIC
-  Boost::log_setup
+target_link_libraries(nvmm
+  PUBLIC
   Boost::log
   ${ATOMICS_LIBRARIES}
-)
-
-target_link_libraries(nvmm PRIVATE
+  PRIVATE
   Pmem::pmem
-  Boost::thread
-  Boost::system
   Boost::filesystem
   ${YAML_CPP_LIBRARIES}
+)
+
+target_compile_definitions(nvmm PUBLIC
+  BOOST_LOG_DYN_LINK
 )

@@ -130,10 +130,7 @@ endif()
 #
 # add boost
 #
-find_package(Boost 1.65 COMPONENTS log log_setup thread system filesystem atomic regex REQUIRED)
-
-# for boost::log
-add_compile_definitions(BOOST_LOG_DYN_LINK)
+find_package(Boost 1.65 REQUIRED COMPONENTS log filesystem)
 
 message(STATUS "====================")
 
