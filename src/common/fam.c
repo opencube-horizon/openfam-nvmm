@@ -38,7 +38,7 @@ void fam_invalidate(const void *addr, size_t len) {
 #ifdef __x86_64__
         _mm_clflush((char *)uptr);
 #elif defined(__aarch64__)
-        asm volatile("dc\tivac, %0" : : "r"((char *)uptr) : "memory");
+        asm volatile("dc\tcivac, %0" : : "r"((char *)uptr) : "memory");
 #else
 #pragma error "No implementation for cache invalidation"
 #endif
