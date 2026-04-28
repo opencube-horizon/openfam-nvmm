@@ -26,7 +26,7 @@
 
 #include <string>
 
-#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem.hpp>
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/mman.h>
